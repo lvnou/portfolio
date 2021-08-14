@@ -10,10 +10,8 @@ class AccountArray(pf.SettedBaseArray):
         super(AccountArray,self).__init__(array_type_handler = AccountHandler, *args, **kwargs)
 
 class Account(pf.SettedBaseclass):
-    pass	
-#	def __init__(self,json_file_path):
-#		return super(Portfolio,self).__init__(json_file_path)
-		
+    pass
+    
 class BankAccount(Account):
     pass
     

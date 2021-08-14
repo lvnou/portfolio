@@ -17,6 +17,8 @@ class BaseClass:
         
           
 class SettedBaseclass(BaseClass):
+    _default_setts = dict()
+
     def __init__(self, json_file_path = None, setts = None):
         self._json_path = None
         if json_file_path is not None:
@@ -24,7 +26,9 @@ class SettedBaseclass(BaseClass):
             self._json_path = Path(json_file_path)
 
         if setts is not None:
-            self._parse_setts(setts)
+            setts_with_default = self._default_setts.copy()
+            setts_with_default.update(setts)
+            self._parse_setts(setts_with_default)
 
     def _parse_var(self, var):
         if isinstance(var, str):
@@ -81,9 +85,10 @@ class SettedBaseArray(BaseArray):
     def __init__(self, json_file_path, *args, **kwargs):
         super(SettedBaseArray,self).__init__(*args, **kwargs)
         
-        setts = self._parse_json(json_file_path)
-        for k, v in setts.items():
-            self[k] = self._type(setts = v).get()
+        if json_file_path is not None:
+            setts = self._parse_json(json_file_path)
+            for k, v in setts.items():
+                self[k] = self._type(setts = v).get()
 
 
 ################################################################

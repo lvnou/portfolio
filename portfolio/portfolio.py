@@ -1,5 +1,6 @@
 import portfolio as pf
 import portfolio.account as acc
+import portfolio.asset as asse
 
 class PortfolioHandler(pf.SettedBaseHandler):
     def __init__(self, *args, **kwargs):
@@ -9,8 +10,14 @@ class PortfolioHandler(pf.SettedBaseHandler):
 
 class Portfolio(pf.SettedBaseclass):
     _accounts = None
+    _assets = None
     
     def __init__(self,json_file_path):
+        self._default_setts.update({
+                                    "account_json" : None,
+                                    "asset_json" : None
+                                    })
+                                
         return super(Portfolio,self).__init__(json_file_path)
         
         
@@ -19,9 +26,17 @@ class Portfolio(pf.SettedBaseclass):
         if acc_json is not None:
             self._accounts = acc.AccountArray(acc_json)
         
+        asset_json = self._parse_var(setts["asset_json"])
+        if asset_json is not None:
+            self._assets = asse.AssetArray(asset_json)
+        
+        
         return self
         
     @property
     def accounts(self):
         return self._accounts
         
+    @property
+    def assets(self):
+        return self._assets
