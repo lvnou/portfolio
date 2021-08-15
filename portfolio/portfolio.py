@@ -1,6 +1,7 @@
 import portfolio as pf
 import portfolio.account as acc
 import portfolio.asset as asse
+import pandas as pd
 
 class PortfolioHandler(pf.SettedBaseHandler):
     def __init__(self, *args, **kwargs):
@@ -40,3 +41,14 @@ class Portfolio(pf.SettedBaseclass):
     @property
     def assets(self):
         return self._assets
+        
+    @property
+    def asset_holdings(self):
+        all_hold_acc = [a.asset_holdings.set_index("asset_name") for a in self.accounts.values()]
+        df0 = all_hold_acc[0]
+        if len(all_hold_acc)>1:
+            for df1 in all_hold_acc[1:]:
+                df0 = df0.add(df1,fill_value=0.0)
+        
+        df0.reset_index(inplace=True)
+        return df0

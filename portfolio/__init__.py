@@ -31,9 +31,6 @@ class BaseClass:
             if cnew != c:
                 del df[c]
         
-#        firstcol=df.columns.values[0]
-       # df =  df[~df[firstcol].str.startswith("--")]
-        
         df.reset_index(drop=True, inplace=True)
         
         return df
@@ -44,10 +41,8 @@ class SettedBaseclass(BaseClass):
 
     def __init__(self, json_file_path = None, setts = None):
         self._json_path = Path(json_file_path)
-#        if json_file_path is not None:
         if setts is None:
             setts = self._parse_json(json_file_path)
-#            self._json_path = Path(json_file_path)
 
         if setts is not None:
             setts_with_default = self._default_setts.copy()

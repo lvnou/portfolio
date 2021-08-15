@@ -2,6 +2,7 @@
 
     "ETF_1" : {
                 "type" : "EXCHANGE_TRADED_FUND",
+                "issuer" : "MyBank",
                 "geographic_region" : {
                                         "country" : "Germany",
                                         "continent" : "Europe"
@@ -24,6 +25,7 @@
     "MF_1" : {
                 "type" : "MUTUAL_FUND",
                  "risk_class" : 2,
+                 "issuer": "MyBank",
                 "geographic_region" : {
                                         "country" : "USA",
                                         "continent" : "North America"

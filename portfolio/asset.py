@@ -75,13 +75,9 @@ class Asset(pf.SettedBaseclass):
         return self._one_region(*args, **kwargs)
 
     def _parse_setts(self, setts):
-        print(setts)
         risk_class = self._parse_var(setts["risk_class"])
         self._risk_class = risk_class
         self._init_region(**setts["geographic_region"])
-      #if risk_class is not None:
-        #  elif self._default_risk_class is not None:
-      #      self._risk_class = self._default_risk_class
         
         return self
         
@@ -95,7 +91,23 @@ class Asset(pf.SettedBaseclass):
     
 
 class Security(Asset):
-    pass
+    _default_issuer = "unknown"
+    _issuer = None
+    
+    def __init__(self, *args, **kwargs):
+        self._default_setts.update({
+                                    "issuer" : self._default_issuer
+                                    })
+        return super(Security, self).__init__(*args, **kwargs)
+        
+    def _parse_setts(self, setts):
+        self._issuer = self._parse_var(setts["issuer"])
+        return super(Security, self)._parse_setts(setts)
+        
+    @property
+    def issuer(self):
+        return self._issuer
+        
     
 class Cash(Asset):
     _default_risk_class = 0
