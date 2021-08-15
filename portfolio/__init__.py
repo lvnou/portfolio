@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
-
+import io
+import pandas as pd
 
 ################################################################
 # Base class
@@ -14,6 +15,28 @@ class BaseClass:
             print(ex)
             raise ex
         return setts 
+        
+   
+    def _parse_df_from_text(self,text, cols = dict()):
+        buf = io.StringIO(text)
+        df = pd.read_csv(buf, delimiter = "|", header = 0, comment = "#", dtype="str",skiprows=[2])
+        
+        df = df.dropna(how="all",axis=1)
+        df = df.dropna(how="any",axis=0)
+
+        for c in df.columns.values:
+            cnew = c.strip()
+            if cnew in cols: cnew = cols[cnew]
+            df[cnew] = df[c].str.strip()
+            if cnew != c:
+                del df[c]
+        
+#        firstcol=df.columns.values[0]
+       # df =  df[~df[firstcol].str.startswith("--")]
+        
+        df.reset_index(drop=True, inplace=True)
+        
+        return df
         
           
 class SettedBaseclass(BaseClass):

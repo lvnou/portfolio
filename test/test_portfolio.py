@@ -29,9 +29,7 @@ def test_account_transactions():
     assert isinstance(t1, tr.TransactionStatement)
     assert isinstance(t2, tr.TransactionStatement)
     
-def test_initialize_assets():
+def test_initialize_assets_portfolio():
     p = portfolio.PortfolioHandler("03_test_asset/portfolio.json").get()
     a = p.assets
     assert len(a) == 3
-    assert isinstance(a["ETF_1"], asse.ExchangeTradedFund)
-    assert isinstance(a["MF_1"], asse.MutualFund)

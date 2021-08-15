@@ -16,6 +16,13 @@ class AccountArray(pf.SettedBaseArray):
 class Account(pf.SettedBaseclass):
     _transactions = None
     
+    def __init__(self, *args, **kwargs):
+        self._default_setts.update({
+                                    "transactions_file" : None
+                                    })
+        return super(Account, self).__init__(*args, **kwargs)
+    
+    
     def _parse_setts(self, setts):
         if setts["transactions_file"] is not None:
             self.read_transactions(self._parse_var(setts["transactions_file"]))

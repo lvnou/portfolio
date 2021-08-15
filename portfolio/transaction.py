@@ -9,20 +9,10 @@ class TransactionStatement(pf.BaseClass):
     
     def _parse_df_from_text(self,text):
         cols = {"Asset Name" : "asset_name", "Value": "value", "Date": "date"}
-    
-        buf = io.StringIO(text)
-        df = pd.read_csv(buf, delimiter = "|", header = 0, comment = "#", dtype="str")
-        
-        for c in df.columns.values:
-            df[cols[c.strip()]] = df[c].str.strip()
-            del df[c]
-        
-        df =  df[~df.asset_name.str.startswith("--")]
+        df = super(TransactionStatement,self)._parse_df_from_text(text, cols=cols)
         
         df["value"] = pd.to_numeric(df["value"], downcast = "float")
         df["date"] = pd.to_datetime(df["date"],dayfirst=True)
-        
-        df.reset_index(drop=True, inplace=True)
         
         return df
     

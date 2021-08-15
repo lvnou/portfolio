@@ -1,0 +1,34 @@
+{
+
+    "ETF_1" : {
+                "type" : "EXCHANGE_TRADED_FUND",
+                "geographic_region" : {
+                                        "country" : "Germany",
+                                        "continent" : "Europe"
+                                       }
+
+    },
+
+
+
+    "ETF_2" : {
+                "type" : "EXCHANGE_TRADED_FUND",
+                 "risk_class" : 3,
+                "geographic_region" : {
+                                        "file" : "$json_dir$/etf_2_regions.txt"
+                                       }
+
+    },
+
+
+    "MF_1" : {
+                "type" : "MUTUAL_FUND",
+                 "risk_class" : 2,
+                "geographic_region" : {
+                                        "country" : "USA",
+                                        "continent" : "North America"
+                                       }
+
+    }
+
+}
