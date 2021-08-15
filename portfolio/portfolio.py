@@ -53,8 +53,23 @@ class Portfolio(pf.SettedBaseclass):
         df0.reset_index(inplace=True)
         return df0
         
+    @property
+    def account_holdings(self):
+        all_hold_acc = [(an, av.asset_holdings["value"].sum()) for an, av in self.accounts.items()]
+        return pd.DataFrame(all_hold_acc, columns = ["account_name","value"])
         
     def _collect_asset_attribute_scalar(self, attr_name):
+        holds = self.asset_holdings.copy()
+        holds[attr_name] = [getattr(self.assets[an], attr_name) for an in holds["asset_name"].values]
+        
+        coll = {attr_name:[], "value" : []} 
+        for av, dfi in holds.groupby(attr_name):
+            coll[attr_name].append(av)
+            coll["value"].append(dfi["value"].sum())
+            
+        return pd.DataFrame(coll)
+        
+    def collect_risk_class(self):
+        return self._collect_asset_attribute_scalar("risk_class")
         
         
-    def collect_risk_class(self,

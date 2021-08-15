@@ -37,8 +37,22 @@ def test_initialize_assets_portfolio():
     assert len(a) == 3
     
     
-def test_holdings_in_portfolio():
+def test_asset_holdings_in_portfolio():
     p = portfolio.PortfolioHandler("04_test_asset_and_account/portfolio.json").get()
     expected_df = pd.DataFrame({"asset_name":["ETF_1","ETF_2","LIQUID","MF_1"], "value" : [1104.,1001.,120012.,9950.]})
     pdt.assert_frame_equal(p.asset_holdings, expected_df, check_dtype=False, check_like = True)
+
+def test_account_holdings_in_portfolio():
+    p = portfolio.PortfolioHandler("04_test_asset_and_account/portfolio.json").get()
+    expected_df = pd.DataFrame({"account_name":["Account_1","Account_2"], "value" : [2015.0, 130052.0]})
+    pdt.assert_frame_equal(p.account_holdings, expected_df, check_dtype=False, check_like = True)
+
+
+def test_collect_risk_class_portfolio():
+    p = portfolio.PortfolioHandler("04_test_asset_and_account/portfolio.json").get()
+    df_risk = p.collect_risk_class()
+    expected_df = pd.DataFrame({"risk_class":[0,2,3],"value":[120012.0,9950.0,2105.0]})
+    pdt.assert_frame_equal(df_risk, expected_df, check_dtype=False, check_like = True)
+
+
 
