@@ -52,3 +52,9 @@ class Portfolio(pf.SettedBaseclass):
         
         df0.reset_index(inplace=True)
         return df0
+        
+        
+    def _collect_asset_attribute_scalar(self, attr_name):
+        
+        
+    def collect_risk_class(self,

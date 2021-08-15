@@ -16,6 +16,10 @@
     "MF_1" : {
                 "type" : "MUTUAL_FUND"
 
-    }
+    },
+    
+    "LIQUID": {
+    
+    "type" : "CASH"}
 
 }
