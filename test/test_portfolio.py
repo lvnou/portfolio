@@ -54,5 +54,9 @@ def test_collect_risk_class_portfolio():
     expected_df = pd.DataFrame({"risk_class":[0,2,3],"value":[120012.0,9950.0,2105.0]})
     pdt.assert_frame_equal(df_risk, expected_df, check_dtype=False, check_like = True)
 
-
+def test_collect_country_portfolio():
+    p = portfolio.PortfolioHandler("04_test_asset_and_account/portfolio.json").get()
+    df_count = p.collect_country()
+    expected_df = pd.DataFrame({"country":["China","Germany","USA","unknown"],"value":[250.25,1604.50,10200.25,120012.00]})
+    pdt.assert_frame_equal(df_count, expected_df, check_dtype=False, check_like = True)
 

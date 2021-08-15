@@ -1,0 +1,25 @@
+{
+
+    "ETF_1" : {
+                "type" : "EXCHANGE_TRADED_FUND"
+
+    },
+
+
+
+    "ETF_2" : {
+                "type" : "EXCHANGE_TRADED_FUND"
+
+    },
+
+
+    "MF_1" : {
+                "type" : "MUTUAL_FUND"
+
+    },
+    
+    "LIQUID": {
+    
+    "type" : "CASH"}
+
+}

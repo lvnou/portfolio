@@ -69,7 +69,27 @@ class Portfolio(pf.SettedBaseclass):
             
         return pd.DataFrame(coll)
         
+    def _collect_asset_attribute_dataframe(self, attr_name, attr_to_collect_name):
+        holds = self.asset_holdings #.copy()
+        all_df = []
+        for an, av in zip(holds["asset_name"], holds["value"]):
+            df = getattr(self.assets[an], attr_name).copy()
+            df["value"] = df["weight"] * av
+            all_df.append(df)
+        
+        df_col = pd.concat(all_df)
+        
+        coll = {attr_to_collect_name:[], "value" : []} 
+        for av, dfi in df_col.groupby(attr_to_collect_name):
+            coll[attr_to_collect_name].append(av)
+            coll["value"].append(dfi["value"].sum())
+            
+        return pd.DataFrame(coll)
+        
     def collect_risk_class(self):
         return self._collect_asset_attribute_scalar("risk_class")
         
+        
+    def collect_country(self):
+        return self._collect_asset_attribute_dataframe("geographic_region", "country")
         
