@@ -1,7 +1,7 @@
 # portfolio
 
 ## Description
-This is a small Python-code for tracking private investments.
+This is a small Python code for tracking private investments.
 It allows to evaluate the diversification of one's portfolio by e.g. geographic region or risk level.
 
 ## Installation
@@ -13,9 +13,9 @@ conda install --file requirements.txt
 install the required dependencies.
 Then, install the portfolio repository with
 ```
-pip install -e portfolio
+pip install -e .
 ```
-in the cloned git-repository.
+in the cloned git repository.
 
 ## Usage
 See the Jupyter notebooks in the `examples/` directory.

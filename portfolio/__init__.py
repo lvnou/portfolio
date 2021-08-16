@@ -18,6 +18,7 @@ class BaseClass:
         
    
     def _parse_df_from_text(self,text, cols = dict()):
+        
         buf = io.StringIO(text)
         df = pd.read_csv(buf, delimiter = "|", header = 0, comment = "#", dtype="str",skiprows=[2])
         

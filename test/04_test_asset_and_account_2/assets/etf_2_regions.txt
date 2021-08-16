@@ -1,0 +1,6 @@
+# Geographic regions for an asset
+Weight  |   Country   |   Continent   |
+---------------------------------------
+0.5     |   Germany   |   Europe      |
+0.25    |   China     |   Asia        |
+0.25    |   USA       | North America |

@@ -36,6 +36,10 @@ def test_initialize_assets_portfolio():
     a = p.assets
     assert len(a) == 3
     
+
+def test_total_value_portfolio():
+    p = portfolio.PortfolioHandler("04_test_asset_and_account/portfolio.json").get()
+    assert p.total_value == 132067.0 
     
 def test_asset_holdings_in_portfolio():
     p = portfolio.PortfolioHandler("04_test_asset_and_account/portfolio.json").get()
@@ -47,6 +51,10 @@ def test_account_holdings_in_portfolio():
     expected_df = pd.DataFrame({"account_name":["Account_1","Account_2"], "value" : [2015.0, 130052.0]})
     pdt.assert_frame_equal(p.account_holdings, expected_df, check_dtype=False, check_like = True)
 
+def test_account_holdings_in_portfolio2():
+    p = portfolio.PortfolioHandler("04_test_asset_and_account_2/portfolio.json").get()
+    expected_df = pd.DataFrame({"account_name":["Account_1","Account_2"], "value" : [2014.0, 130052.0]})
+    pdt.assert_frame_equal(p.account_holdings, expected_df, check_dtype=False, check_like = True)
 
 def test_collect_risk_class_portfolio():
     p = portfolio.PortfolioHandler("04_test_asset_and_account/portfolio.json").get()

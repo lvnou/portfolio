@@ -58,6 +58,10 @@ class Portfolio(pf.SettedBaseclass):
         all_hold_acc = [(an, av.asset_holdings["value"].sum()) for an, av in self.accounts.items()]
         return pd.DataFrame(all_hold_acc, columns = ["account_name","value"])
         
+    @property
+    def total_value(self):
+        return self.account_holdings["value"].sum()
+        
     def _collect_asset_attribute_scalar(self, attr_name):
         holds = self.asset_holdings.copy()
         holds[attr_name] = [getattr(self.assets[an], attr_name) for an in holds["asset_name"].values]

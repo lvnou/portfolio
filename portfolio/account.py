@@ -60,17 +60,30 @@ class Account(pf.SettedBaseclass):
         assets_transactions = self._transactions.transactions.asset_name
         return pd.concat((assets_status, assets_transactions)).unique()
         
+    def _get_last_status_for_asset(self,asset_name):
+        import datetime
+        status = self._transactions.status
+        status = status[status["asset_name"] == asset_name]
+        if len(status) == 0:
+            return 0.0, np.datetime64(1, 'Y') #datetime.date(1,1,1)
+            
+        last_status_date = status["date"].max()
+        last_status = status[status["date"] == last_status_date]
+        
+        if len(last_status) == 0:
+            return 0.0, last_status_date
+        
+        return last_status["value"].values[0], last_status_date
+        
+        
     def _value_for_asset(self, asset_name):
         """
         Value for the asset with `asset_name` held by the account.
         """
-        status = self._transactions.status
+        last_status, last_status_date = self._get_last_status_for_asset(asset_name)
         trans = self._transactions.transactions
         
-        status = status[status["asset_name"] == asset_name]
-        last_status_date = status["date"].max()
-        last_status = status[status["date"] == last_status_date]["value"].values[0]
-        
+
         trans = trans[trans["asset_name"] == asset_name]
         trans_after_last_status = trans[trans["date"] > last_status_date]["value"].sum()
         
