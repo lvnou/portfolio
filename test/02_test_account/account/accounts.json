@@ -1,0 +1,13 @@
+{
+
+    "Account_1" : {
+                "type" : "BANK"
+
+    },
+
+    "Account_2" : {
+                "type" : "BANK"
+
+    }
+
+}

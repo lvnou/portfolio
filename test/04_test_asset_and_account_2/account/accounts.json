@@ -1,0 +1,15 @@
+{
+
+    "Account_1" : {
+                "type" : "BANK",
+                "transactions_file" : "$json_dir$/trans_acc_1.txt"
+
+    },
+
+    "Account_2" : {
+                "type" : "BANK",
+                "transactions_file" : "$json_dir$/trans_acc_2.txt"
+
+    }
+
+}

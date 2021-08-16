@@ -1,0 +1,6 @@
+{
+
+    "type" : "PORTFOLIO",
+    "account_json" : "$json_dir$/account/accounts.json"
+
+}
