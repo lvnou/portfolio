@@ -4,6 +4,8 @@ import pytest
 import pandas as pd
 import pandas.testing as pdt
 import numpy as np
+from .util import get_test_path
+
 
 account_names = ["Account_1", "Account_2"]
 assets = [['ETF_1', 'ETF_2', 'LIQUID'], ["ETF_1","MF_1","LIQUID"]]
@@ -15,18 +17,18 @@ holds = [
 
 
 def test_initialize_accounts():
-    a = acc.AccountArray("02_test_account/account/accounts.json")
+    a = acc.AccountArray(get_test_path("02_test_account/account/accounts.json"))
     assert isinstance(a["Account_1"], acc.BankAccount)
     assert isinstance(a["Account_2"], acc.BankAccount)
     
 @pytest.mark.parametrize("aname, asse", zip(account_names, assets))
 def test_assets_in_account(aname, asse):
-    aa = acc.AccountArray("04_test_asset_and_account/account/accounts.json")
+    aa = acc.AccountArray(get_test_path("04_test_asset_and_account/account/accounts.json"))
     assert set([*aa[aname].asset_names]) == set([*asse])
 
 
 @pytest.mark.parametrize("aname, hold", zip(account_names, holds))
 def test_holdings_in_account(aname, hold):
-    aa = acc.AccountArray("04_test_asset_and_account/account/accounts.json")
+    aa = acc.AccountArray(get_test_path("04_test_asset_and_account/account/accounts.json"))
     pdt.assert_frame_equal(aa[aname].asset_holdings, hold, check_dtype=False, check_like = True)
 

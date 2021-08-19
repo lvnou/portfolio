@@ -1,4 +1,4 @@
-import json
+import jstyleson
 from pathlib import Path
 import io
 import pandas as pd
@@ -9,7 +9,7 @@ import pandas as pd
 class BaseClass:
     def _parse_json(self, json_file_path):
         try:
-            setts = json.load(open(json_file_path,"r"))
+            setts = jstyleson.load(open(json_file_path,"r"))
         except Exception as ex:
             print("Error while parsing {}:".format(json_file_path))
             print(ex)

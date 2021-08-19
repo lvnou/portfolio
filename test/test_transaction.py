@@ -3,9 +3,10 @@ import pytest
 from datetime import date
 import pandas as pd
 import pandas.testing as pdt
+from .util import get_test_path
 
 
-t_files = ["02_test_account_transactions/account/trans_acc_1.txt","02_test_account_transactions/account/trans_acc_2.txt"]
+t_files = [get_test_path("02_test_account_transactions/account/trans_acc_1.txt"),get_test_path("02_test_account_transactions/account/trans_acc_2.txt")]
 
 sdfs = [
             pd.DataFrame( { "asset_name" : ["ETF_1","ETF_1","ETF_1","ETF_2","LIQUID"],

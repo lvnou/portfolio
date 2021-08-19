@@ -1,4 +1,11 @@
 {   
+/* this is a test comment */
+
+    /* Multi
+    line
+  test
+comment
+    */
 
     "type" : "PORTFOLIO",
     "account_json" : null
