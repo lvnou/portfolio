@@ -62,11 +62,7 @@ class Asset(pf.SettedBaseclass):
     def _region_from_file(self, file):
         fname = self._parse_var(file)
         cols = {"Weight" : "weight", "Country": "country", "Continent": "continent"}
-        df = self._parse_df_from_text(open(fname,"r").read(), cols=cols)
-
-        df["weight"] = pd.to_numeric(df["weight"], downcast = "float")
-        
-        self._region_df = df
+        self._region_df = self._parse_df_from_text(open(fname,"r").read(), cols=cols, numeric_cols = ["weight"])
         return self
 
     def _init_region(self, file = None, *args, **kwargs):

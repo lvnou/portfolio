@@ -13,14 +13,16 @@ class BaseClass:
         except Exception as ex:
             print("Error while parsing {}:".format(json_file_path))
             print(ex)
+            print(open(json_file_path,"r").read())
             raise ex
+            
         return setts 
         
    
-    def _parse_df_from_text(self,text, cols = dict()):
+    def _parse_df_from_text(self,text, cols = dict(), numeric_cols = []):
         
         buf = io.StringIO(text)
-        df = pd.read_csv(buf, delimiter = "|", header = 0, comment = "#", dtype="str",skiprows=[2])
+        df = pd.read_csv(buf, delimiter = "|", header = 0, comment = "#", dtype="str") #,skiprows=[1])
         
         df = df.dropna(how="all",axis=1)
         df = df.dropna(how="any",axis=0)
@@ -33,6 +35,14 @@ class BaseClass:
                 del df[c]
         
         df.reset_index(drop=True, inplace=True)
+        
+        def parse_numeric(x):
+            if "%" in x:
+                x=float(x.replace("%",""))/100.
+            return float(x)
+        for c in numeric_cols:
+            df[c] = pd.to_numeric(df[c].apply(parse_numeric), downcast = "float")
+                
         
         return df
         
