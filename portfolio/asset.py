@@ -117,6 +117,3 @@ class ExchangeTradedFund(Security):
     _default_risk_class = 3
     
     
- 
-		
-    

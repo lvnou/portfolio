@@ -51,14 +51,20 @@ class SettedBaseclass(BaseClass):
     _default_setts = dict()
 
     def __init__(self, json_file_path = None, setts = None):
-        self._json_path = Path(json_file_path)
+        self._json_path = None
+        if json_file_path is not None:
+            self._json_path = Path(json_file_path)
+            
         if setts is None:
-            setts = self._parse_json(json_file_path)
+            if json_file_path is not None:
+                setts = self._parse_json(json_file_path)
 
         if setts is not None:
             setts_with_default = self._default_setts.copy()
             setts_with_default.update(setts)
             self._parse_setts(setts_with_default)
+
+        return super(SettedBaseclass, self).__init__()
 
     def _parse_var(self, var):
         if isinstance(var, str):

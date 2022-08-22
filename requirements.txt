@@ -6,3 +6,4 @@ jupyter
 pytest
 matplotlib
 jstyleson
+investpy
