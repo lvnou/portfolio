@@ -1,5 +1,7 @@
 import portfolio as pf
 import portfolio.asset as asse
+import portfolio.asset_performance as apf
+
 import pytest
 import pandas as pd
 import pandas.testing as pdt
@@ -19,6 +21,9 @@ def test_initialize_assets():
     a = asse.AssetArray(get_test_path("03_test_asset_with_values/assets.json"))
     assert isinstance(a["ETF_1"], asse.ExchangeTradedFund)
     assert isinstance(a["MF_1"], asse.MutualFund)
+
+    assert isinstance(a["MF_1"].performance, apf.NotAvailableAssetPerformance)
+
 
 @pytest.mark.parametrize("aname, rkexp", zip(anames, rks))
 def test_risk_class(aname, rkexp):
