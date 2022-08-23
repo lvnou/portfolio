@@ -50,6 +50,7 @@ class AssetPerformance(pf.SettedBaseclass):
 
 class NotAvailableAssetPerformance(AssetPerformance):
     def _calc_price(self, dates):
+        warnings.warn("Asset performance not available. Assuming constant price of unity.")
         return np.ones(dates.shape)
 
 class InvestingComAssetPerformance(AssetPerformance):
@@ -67,7 +68,7 @@ class InvestingComAssetPerformance(AssetPerformance):
     def _calc_price(self, dates):
         sr = investpy.search_quotes(**self._search_args)
         if len (sr) > 1:
-            warnings.warn(f"investing.com API: More than one result found, choosing first one.\nArgs: {self._search_args}")
+            warnings.warn(f"investing.com API: More than one result found, choosing first one.\nArgs: {self._search_args}\nFound: {sr[0]}")
         elif len(sr) == 0:
             raise ValueError(f"investing.com API: No result found.\nArgs: {self._search_args}")
         srd = sr[0].retrieve_historical_data(   from_date = min(dates).strftime(self._ic_api_timefmt),

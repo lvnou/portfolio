@@ -14,13 +14,13 @@ class Portfolio(pf.SettedBaseclass):
     _accounts = None
     _assets = None
     
-    def __init__(self,json_file_path):
+    def __init__(self, *args, **kwargs):
         self._default_setts.update({
                                     "account_json" : None,
                                     "asset_json" : None
                                     })
                                 
-        return super(Portfolio,self).__init__(json_file_path)
+        return super(Portfolio,self).__init__(*args, **kwargs)
         
         
     def _parse_setts(self, setts):

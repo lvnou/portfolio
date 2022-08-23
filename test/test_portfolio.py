@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 import pandas.testing as pdt
 from .util import get_test_path
+import pytest
 
 def test_initialize_portfolio():
     p = portfolio.PortfolioHandler(get_test_path("01_test_portfolio/portfolio.json")).get()
@@ -163,6 +164,13 @@ def test_collect_performance():
     assert cp.keys() == expected.keys()
     assert np.all(cp['LIQUID'][1] ==  expected['LIQUID'][0]*120012.)
     assert np.all(cp['LIQUID'][0] ==  expected['LIQUID'][1])
+
+@pytest.mark.parametrize("pname", ["04_test_asset_and_account/portfolio.json", "05_test_portfolio_performance/portfolio.json"])
+def test_collect_performance_check_only_len(pname):
+    p = portfolio.PortfolioHandler(get_test_path(pname)).get()
+    cp= p.collect_performance("2021-1-1","2022-1-1", 20)
+    assert cp['LIQUID'][1].size ==  20
+    assert cp['LIQUID'][0].size ==  20
 
 def test_total_performance_portfolio():
     p = portfolio.PortfolioHandler(get_test_path("04_test_asset_and_account/portfolio.json")).get()

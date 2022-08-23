@@ -98,16 +98,20 @@ class SettedBaseHandler(BaseHandler):
     _type_field = "type"
 
     def __init__(self, json_file_path = None, setts = None):
-        if json_file_path is not None:
-            setts = self._parse_json(json_file_path)
-            
         self._json = json_file_path
+        self._setts = setts
+        
+        if setts is None:
+            if json_file_path is not None:
+                setts = self._parse_json(json_file_path)
+            
         _type = setts[self._type_field]
         return super(SettedBaseHandler, self).__init__(_type)
     
     def get(self, *args, **kwargs):
         if isinstance(self._json, str):
             kwargs["json_file_path"] = self._json
+        kwargs["setts"] = self._setts
         return super(SettedBaseHandler, self).get( *args, **kwargs)
         
 ################################################################
