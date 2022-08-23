@@ -1,4 +1,4 @@
-import json
+import jstyleson
 from pathlib import Path
 import io
 import pandas as pd
@@ -9,18 +9,20 @@ import pandas as pd
 class BaseClass:
     def _parse_json(self, json_file_path):
         try:
-            setts = json.load(open(json_file_path,"r"))
+            setts = jstyleson.load(open(json_file_path,"r"))
         except Exception as ex:
             print("Error while parsing {}:".format(json_file_path))
             print(ex)
+            print(open(json_file_path,"r").read())
             raise ex
+            
         return setts 
         
    
-    def _parse_df_from_text(self,text, cols = dict()):
+    def _parse_df_from_text(self,text, cols = dict(), numeric_cols = []):
         
         buf = io.StringIO(text)
-        df = pd.read_csv(buf, delimiter = "|", header = 0, comment = "#", dtype="str",skiprows=[2])
+        df = pd.read_csv(buf, delimiter = "|", header = 0, comment = "#", dtype="str") #,skiprows=[1])
         
         df = df.dropna(how="all",axis=1)
         df = df.dropna(how="any",axis=0)
@@ -34,6 +36,14 @@ class BaseClass:
         
         df.reset_index(drop=True, inplace=True)
         
+        def parse_numeric(x):
+            if "%" in x:
+                x=float(x.replace("%",""))/100.
+            return float(x)
+        for c in numeric_cols:
+            df[c] = pd.to_numeric(df[c].apply(parse_numeric), downcast = "float")
+                
+        
         return df
         
           
@@ -41,14 +51,31 @@ class SettedBaseclass(BaseClass):
     _default_setts = dict()
 
     def __init__(self, json_file_path = None, setts = None):
-        self._json_path = Path(json_file_path)
+        self._json_path = None
+        if json_file_path is not None:
+            self._json_path = Path(json_file_path)
+            
         if setts is None:
-            setts = self._parse_json(json_file_path)
+            if json_file_path is not None:
+                setts = self._parse_json(json_file_path)
 
         if setts is not None:
             setts_with_default = self._default_setts.copy()
             setts_with_default.update(setts)
+            self._setts_org = setts_with_default
             self._parse_setts(setts_with_default)
+
+        return super(SettedBaseclass, self).__init__()
+
+    @property
+    def json_path(self):
+        return self._json_path
+
+    @json_path.setter
+    def json_path(self, val):
+        self._json_path = Path(val)
+        self._parse_setts(self._setts_org)
+        return self
 
     def _parse_var(self, var):
         if isinstance(var, str):
@@ -82,16 +109,20 @@ class SettedBaseHandler(BaseHandler):
     _type_field = "type"
 
     def __init__(self, json_file_path = None, setts = None):
-        if json_file_path is not None:
-            setts = self._parse_json(json_file_path)
-            
         self._json = json_file_path
+        self._setts = setts
+        
+        if setts is None:
+            if json_file_path is not None:
+                setts = self._parse_json(json_file_path)
+            
         _type = setts[self._type_field]
         return super(SettedBaseHandler, self).__init__(_type)
     
     def get(self, *args, **kwargs):
         if isinstance(self._json, str):
             kwargs["json_file_path"] = self._json
+        kwargs["setts"] = self._setts
         return super(SettedBaseHandler, self).get( *args, **kwargs)
         
 ################################################################

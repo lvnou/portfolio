@@ -3,4 +3,4 @@ Weight  |   Country   |   Continent   |
 ---------------------------------------
 0.5     |   Germany   |   Europe      |
 0.25    |   China     |   Asia        |
-25%     |   USA       | North America |
+0.25    |   USA       | North America |

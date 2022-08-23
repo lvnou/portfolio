@@ -2,6 +2,7 @@ import portfolio as pf
 import portfolio.account as acc
 import portfolio.asset as asse
 import pandas as pd
+import numpy as np
 
 class PortfolioHandler(pf.SettedBaseHandler):
     def __init__(self, *args, **kwargs):
@@ -13,13 +14,13 @@ class Portfolio(pf.SettedBaseclass):
     _accounts = None
     _assets = None
     
-    def __init__(self,json_file_path):
+    def __init__(self, *args, **kwargs):
         self._default_setts.update({
                                     "account_json" : None,
                                     "asset_json" : None
                                     })
                                 
-        return super(Portfolio,self).__init__(json_file_path)
+        return super(Portfolio,self).__init__(*args, **kwargs)
         
         
     def _parse_setts(self, setts):
@@ -64,7 +65,11 @@ class Portfolio(pf.SettedBaseclass):
         
     def _collect_asset_attribute_scalar(self, attr_name):
         holds = self.asset_holdings.copy()
-        holds[attr_name] = [getattr(self.assets[an], attr_name) for an in holds["asset_name"].values]
+        def getattr_or_unknown(o,a):
+            if hasattr(o,a):
+                return getattr(o,a)
+            return "unknown"
+        holds[attr_name] = [getattr_or_unknown(self.assets[an], attr_name) for an in holds["asset_name"].values]
         
         coll = {attr_name:[], "value" : []} 
         for av, dfi in holds.groupby(attr_name):
@@ -93,7 +98,24 @@ class Portfolio(pf.SettedBaseclass):
     def collect_risk_class(self):
         return self._collect_asset_attribute_scalar("risk_class")
         
-        
     def collect_country(self):
         return self._collect_asset_attribute_dataframe("geographic_region", "country")
-        
+    
+    def collect_issuer(self):
+        return self._collect_asset_attribute_scalar("issuer")
+    
+    def collect_performance(self, *args, disp = False, **kwargs):
+        all_performances = dict()
+        hold = self.asset_holdings
+        for an, av in self.assets.items():
+            if disp:
+                print(f"Collecting performance for {an}")
+            p,d = av.performance.value(relative_to = "LAST", *args, **kwargs)
+            hold_as = hold[hold.asset_name == an]['value'].values[0]
+            all_performances[an] = (d, p*hold_as)
+        return all_performances
+
+    def total_performance(self, *args, **kwargs):
+        perf = self.collect_performance(*args, **kwargs)
+        sum_p = np.sum([x[1] for x in perf.values()], axis = 0)
+        return [*perf.values()][0][0], sum_p

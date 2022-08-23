@@ -1,5 +1,6 @@
 import portfolio as pf
 import pandas as pd
+import portfolio.asset_performance as apf
 
 class AssetHandler(pf.SettedBaseHandler):
     def __init__(self, *args, **kwargs):
@@ -32,6 +33,9 @@ class Asset(pf.SettedBaseclass):
     geographic_region : pd.DataFrame
         Represents the allocation of the asset by  geographic region.
         This DataFrame has the columns "country", "continent" and "weight" representing the according parameters.
+    
+    performance : AssetPerformance
+        Represents the asset's performance over time
     """
     # Risk
     _default_risk_class = None
@@ -39,15 +43,17 @@ class Asset(pf.SettedBaseclass):
     # Geographic region
     _default_country_name = "unknown"
     _default_continent_name = "unknown"
-    
+    # Performance
+    _performance = None
+
     def __init__(self, *args, **kwargs):
         self._default_setts.update({
                                     "risk_class" : self._default_risk_class,
-                                    "geographic_region" : dict()
+                                    "geographic_region" : dict(),
+                                    "performance" : {"type": "NOT_AVAILABLE"}
                                     })
         return super(Asset, self).__init__(*args, **kwargs)
         
-
     def _one_region(self, country = None, continent = None):
         if country is None:
             country = self._default_country_name
@@ -62,11 +68,7 @@ class Asset(pf.SettedBaseclass):
     def _region_from_file(self, file):
         fname = self._parse_var(file)
         cols = {"Weight" : "weight", "Country": "country", "Continent": "continent"}
-        df = self._parse_df_from_text(open(fname,"r").read(), cols=cols)
-
-        df["weight"] = pd.to_numeric(df["weight"], downcast = "float")
-        
-        self._region_df = df
+        self._region_df = self._parse_df_from_text(open(fname,"r").read(), cols=cols, numeric_cols = ["weight"])
         return self
 
     def _init_region(self, file = None, *args, **kwargs):
@@ -78,7 +80,8 @@ class Asset(pf.SettedBaseclass):
         risk_class = self._parse_var(setts["risk_class"])
         self._risk_class = risk_class
         self._init_region(**setts["geographic_region"])
-        
+        self._performance = apf.AssetPerformanceHandler(setts = setts["performance"]).get()
+        self._performance.json_path = self.json_path
         return self
         
     @property
@@ -89,6 +92,9 @@ class Asset(pf.SettedBaseclass):
     def geographic_region(self):
         return self._region_df
     
+    @property
+    def performance(self):
+        return self._performance
 
 class Security(Asset):
     _default_issuer = "unknown"
@@ -120,7 +126,4 @@ class MutualFund(Security):
 class ExchangeTradedFund(Security):
     _default_risk_class = 3
     
-    
- 
-		
     
