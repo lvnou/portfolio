@@ -97,10 +97,12 @@ class Portfolio(pf.SettedBaseclass):
     def collect_country(self):
         return self._collect_asset_attribute_dataframe("geographic_region", "country")
         
-    def collect_performance(self, *args, **kwargs):
+    def collect_performance(self, *args, disp = False, **kwargs):
         all_performances = dict()
         hold = self.asset_holdings
         for an, av in self.assets.items():
+            if disp:
+                print(f"Collecting performance for {an}")
             p,d = av.performance.value(relative_to = "LAST", *args, **kwargs)
             hold_as = hold[hold.asset_name == an]['value'].values[0]
             all_performances[an] = (d, p*hold_as)

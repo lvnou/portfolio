@@ -23,6 +23,22 @@ def test_investcom_performance(search_args):
     p,d = ic.price("2021-1-1","2022-1-1", 20)
     assert p.size == 20
 
+def test_boersefrankfurt_performance():
+    fn = apf.BoerseFrankfurtAssetPerformance(setts={"isin": 'DE0008404005'})
+    p,d = fn.price("2021-1-1","2022-1-1", 20)
+    print(p,d)
+    assert p.size == 20
+
+def test_dekacsv_performance():
+    fn = apf.DekaCSVAssetPerformance(setts={"csv_file_path": 'LU0112241566_Preisexport.csv'})
+    p,d = fn.price("2021-1-1","2022-1-1", 20)
+    assert p.size == 20
+
+def test_dekacsv_performance_outofrange():
+    fn = apf.DekaCSVAssetPerformance(setts={"csv_file_path": 'LU0112241566_Preisexport.csv'})
+    p,d = fn.price("2016-1-1","2022-1-1", 20)
+    assert p.size == 20
+
 def test_performance_handler():
     pfh = apf.AssetPerformanceHandler(setts = {"type": "NOT_AVAILABLE"}).get()
     assert isinstance(pfh, apf.NotAvailableAssetPerformance)
