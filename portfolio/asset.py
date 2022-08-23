@@ -81,6 +81,7 @@ class Asset(pf.SettedBaseclass):
         self._risk_class = risk_class
         self._init_region(**setts["geographic_region"])
         self._performance = apf.AssetPerformanceHandler(setts = setts["performance"]).get()
+        self._performance.json_path = self.json_path
         return self
         
     @property

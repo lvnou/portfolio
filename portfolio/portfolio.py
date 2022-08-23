@@ -65,7 +65,11 @@ class Portfolio(pf.SettedBaseclass):
         
     def _collect_asset_attribute_scalar(self, attr_name):
         holds = self.asset_holdings.copy()
-        holds[attr_name] = [getattr(self.assets[an], attr_name) for an in holds["asset_name"].values]
+        def getattr_or_unknown(o,a):
+            if hasattr(o,a):
+                return getattr(o,a)
+            return "unknown"
+        holds[attr_name] = [getattr_or_unknown(self.assets[an], attr_name) for an in holds["asset_name"].values]
         
         coll = {attr_name:[], "value" : []} 
         for av, dfi in holds.groupby(attr_name):
@@ -96,7 +100,10 @@ class Portfolio(pf.SettedBaseclass):
         
     def collect_country(self):
         return self._collect_asset_attribute_dataframe("geographic_region", "country")
-        
+    
+    def collect_issuer(self):
+        return self._collect_asset_attribute_scalar("issuer")
+    
     def collect_performance(self, *args, disp = False, **kwargs):
         all_performances = dict()
         hold = self.asset_holdings

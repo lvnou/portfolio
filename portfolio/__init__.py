@@ -62,9 +62,20 @@ class SettedBaseclass(BaseClass):
         if setts is not None:
             setts_with_default = self._default_setts.copy()
             setts_with_default.update(setts)
+            self._setts_org = setts_with_default
             self._parse_setts(setts_with_default)
 
         return super(SettedBaseclass, self).__init__()
+
+    @property
+    def json_path(self):
+        return self._json_path
+
+    @json_path.setter
+    def json_path(self, val):
+        self._json_path = Path(val)
+        self._parse_setts(self._setts_org)
+        return self
 
     def _parse_var(self, var):
         if isinstance(var, str):

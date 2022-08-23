@@ -35,10 +35,6 @@ class AssetPerformance(pf.SettedBaseclass):
     """
 
     def __init__(self, *args, **kwargs):
-       # self._default_setts.update({
-        #                            "risk_class" : self._default_risk_class,
-         #                           "geographic_region" : dict()
-          #                          })
         return super(AssetPerformance, self).__init__(*args, **kwargs)
         
     def _calc_price(self, dates):
@@ -92,6 +88,10 @@ class DekaCSVAssetPerformance(AssetPerformance):
     _deka_pricecol = "Ausgabepreis"
     _deka_timecol = "Datum"
 
+    def __init__(self, *args, **kwargs):
+        self._default_setts.update({ "csv_file_path" : "" })
+        return super(DekaCSVAssetPerformance, self).__init__(*args, **kwargs)
+
     def _parse_setts(self, setts):
         self._csv_file = self._parse_var(setts["csv_file_path"])
         return self
@@ -108,7 +108,6 @@ class BoerseFrankfurtAssetPerformance(AssetPerformance):
     """
     def _parse_setts(self, setts):
         self._isin = self._parse_var(setts["isin"])
-        #self._name = self._parse_var(setts["name"])
         return self
 
     def _calc_price(self, dates):
