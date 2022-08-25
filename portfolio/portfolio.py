@@ -111,7 +111,7 @@ class Portfolio(pf.SettedBaseclass):
             if disp:
                 print(f"Collecting performance for {an}")
             p,d = av.performance.value(relative_to = "LAST", *args, **kwargs)
-            hold_as = hold[hold.asset_name == an]['value'].values[0]
+            hold_as = hold[hold.asset_name == an]['value'].sum()
             all_performances[an] = (d, p*hold_as)
         return all_performances
 

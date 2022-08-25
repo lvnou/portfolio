@@ -3,11 +3,14 @@ import pandas as pd
 import numpy as np
 import warnings
 import investpy
+import tessa
 
-import sys
-sys.path.append(r"/home/erik/Documents/script/bf4py")
-import bf4py
-        
+# directory for bf4py needs to be added to python path
+try:
+    import bf4py
+except ImportError:
+    warnings.warn("Could not import bf4py. Can't use BoerseFrankfurtAssetPerformance interface.")
+
 
 def interpolate_datetime(x, xp, yp):
     """
@@ -60,6 +63,8 @@ class NotAvailableAssetPerformance(AssetPerformance):
 class InvestingComAssetPerformance(AssetPerformance):
     _ic_api_timefmt = "%d/%m/%Y"
     _ic_api_pricecol = "Close"
+    _ic_api_pricecol_tessa = "close"
+    _use_tessa = True
 
     def __init__(self, *args, **kwargs):
         self._default_setts.update({ "search_args" : dict() })
@@ -67,19 +72,32 @@ class InvestingComAssetPerformance(AssetPerformance):
 
     def _parse_setts(self, setts):
         self._search_args = self._parse_var(setts["search_args"])
-        #self._name = self._parse_var(setts["name"])
         return self
 
-    def _calc_price(self, dates):
-        #print(f"Getting price information for {self._search_args}")
-        sr = investpy.search_quotes(**self._search_args)
+    def _check_num_items(self, sr):
         if len (sr) > 1:
             warnings.warn(f"investing.com API: More than one result found, choosing first one.\nArgs: {self._search_args}\nFound: {sr[0]}")
         elif len(sr) == 0:
             raise ValueError(f"investing.com API: No result found.\nArgs: {self._search_args}")
+        return self
+
+    def _calc_price_investpy(self, dates):
+        sr = investpy.search_quotes(**self._search_args)
+        self._check_num_items(sr)
         srd = sr[0].retrieve_historical_data(   from_date = min(dates).strftime(self._ic_api_timefmt),
                                                 to_date   = max(dates).strftime(self._ic_api_timefmt) )
         return interpolate_datetime(dates, srd.index, srd[self._ic_api_pricecol])
+
+    def _calc_price_tessa(self, dates):
+        sr = tessa.search(self._search_args['text'])
+        self._check_num_items([*sr.values()][0])
+        srd, currency = tessa.price_history(sr["investing_searchobj_other"][0], "searchobj")
+        return interpolate_datetime(dates, srd.index, srd[self._ic_api_pricecol_tessa])
+
+    def _calc_price(self, dates):
+        if self._use_tessa:
+            return self._calc_price_tessa(dates)
+        return self._calc_price_investpy(dates)
 
 class DekaCSVAssetPerformance(AssetPerformance):
     """
