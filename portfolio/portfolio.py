@@ -101,6 +101,9 @@ class Portfolio(pf.SettedBaseclass):
     def collect_country(self):
         return self._collect_asset_attribute_dataframe("geographic_region", "country")
     
+    def collect_continent(self):
+        return self._collect_asset_attribute_dataframe("geographic_region", "continent")
+
     def collect_issuer(self):
         return self._collect_asset_attribute_scalar("issuer")
     

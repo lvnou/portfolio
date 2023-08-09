@@ -22,7 +22,7 @@ def interpolate_datetime(x, xp, yp):
         warnings.warn("interpolate_datetime: Requested x values are not in given xp bounds. Constant np.interp continuation assumed.")
     # remove unplausible values
     tol = np.median(yp) * 100
-    if np.any(yp>tol)
+    if np.any(yp>tol):
         warnings.warn(f"interpolate_datetime: Removing {(yp>tol).sum()} outliers.")
     xpc = xpc[yp<tol]
     yp = yp[yp<tol]
