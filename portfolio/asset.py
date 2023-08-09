@@ -114,7 +114,6 @@ class Security(Asset):
     def issuer(self):
         return self._issuer
         
-    
 class Cash(Asset):
     _default_risk_class = 0
     
