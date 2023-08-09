@@ -20,6 +20,12 @@ def interpolate_datetime(x, xp, yp):
     xc = np.array(x, dtype="float")
     if (xc.min() < xpc.min()) or (xc.max() > xpc.max()):
         warnings.warn("interpolate_datetime: Requested x values are not in given xp bounds. Constant np.interp continuation assumed.")
+    # remove unplausible values
+    tol = np.median(yp) * 100
+    if np.any(yp>tol):
+        warnings.warn(f"interpolate_datetime: Removing {(yp>tol).sum()} outliers.")
+    xpc = xpc[yp<tol]
+    yp = yp[yp<tol]
     return np.interp(xc, xpc, yp)
 
 class AssetPerformanceHandler(pf.SettedBaseHandler):
@@ -89,15 +95,17 @@ class InvestingComAssetPerformance(AssetPerformance):
         return interpolate_datetime(dates, srd.index, srd[self._ic_api_pricecol])
 
     def _calc_price_tessa(self, dates):
-        sr = tessa.search(self._search_args['text'])
-        self._check_num_items([*sr.values()][0])
-        srd, currency = tessa.price_history(sr["investing_searchobj_other"][0], "searchobj")
-        return interpolate_datetime(dates, srd.index, srd[self._ic_api_pricecol_tessa])
+        sr = tessa.Symbol(self._search_args['isin']).price_history()
+        return interpolate_datetime(dates, sr.df.index, sr.df[self._ic_api_pricecol_tessa])
 
     def _calc_price(self, dates):
-        if self._use_tessa:
-            return self._calc_price_tessa(dates)
-        return self._calc_price_investpy(dates)
+        try:
+            if self._use_tessa:
+                return self._calc_price_tessa(dates)
+            return self._calc_price_investpy(dates)
+        except Exception as ex:
+            warnings.warn(f"Failed to query performance for {self._search_args}. Exception: {ex}.")
+        return NotAvailableAssetPerformance._calc_price(self, dates)
 
 class DekaCSVAssetPerformance(AssetPerformance):
     """
