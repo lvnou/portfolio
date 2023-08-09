@@ -20,6 +20,12 @@ def interpolate_datetime(x, xp, yp):
     xc = np.array(x, dtype="float")
     if (xc.min() < xpc.min()) or (xc.max() > xpc.max()):
         warnings.warn("interpolate_datetime: Requested x values are not in given xp bounds. Constant np.interp continuation assumed.")
+    # remove unplausible values
+    tol = np.median(yp) * 100
+    if np.any(yp>tol)
+        warnings.warn(f"interpolate_datetime: Removing {(yp>tol).sum()} outliers.")
+    xpc = xpc[yp<tol]
+    yp = yp[yp<tol]
     return np.interp(xc, xpc, yp)
 
 class AssetPerformanceHandler(pf.SettedBaseHandler):
