@@ -14,6 +14,10 @@ search_args_invalid = [
         {"test":""},
         ]
 
+search_args_naming = [ 
+        {"isin":"TEST_ISIN"},
+        ]
+
 search_args_crypto = [
              {"symbol" : "BTC", "name":"bitcoin"}
         ]
@@ -52,6 +56,13 @@ def test_investcom_performance_invalid(search_args):
         p,d = ic.price("2021-1-1","2022-1-1", 20)
         assert p.size == 20
         assert np.all(p == 1.)
+
+@pytest.mark.parametrize("search_args", search_args_naming)
+def test_investcom_performance_df(search_args):
+    with pytest.warns(UserWarning):
+        ic = apf.InvestingComAssetPerformance(setts={"search_args": search_args})
+        df = ic.price_df("2021-1-1","2022-1-1", 20)
+        assert "TEST_ISIN_price" in df
 
 # NOT MAINTAINED ANYMORE
 #def test_boersefrankfurt_performance():

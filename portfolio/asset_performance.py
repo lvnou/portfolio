@@ -44,6 +44,8 @@ class AssetPerformance(pf.SettedBaseclass):
     Representing an assets performance
     """
 
+    _default_col_name_price = "price"
+
     def __init__(self, *args, **kwargs):
         self._prices = dict()
         self._cache_price = True
@@ -63,6 +65,15 @@ class AssetPerformance(pf.SettedBaseclass):
             self._prices[calc_key] = self._calc_price(d)
         return self._prices[calc_key]
 
+    def _get_col_name_price(self, name):
+        return name
+
+    def price_df(self, *args, col_name = None, **kwargs):
+        p, d = self.price(*args, **kwargs)
+        if col_name is None:
+            col_name = self._default_col_name_price
+        return pd.DataFrame(data={self._get_col_name_price(col_name):p}, index=d)
+
     def value(self, *args, relative_to = "LAST", **kwargs):
         p, d = self.price(*args, **kwargs)
         if relative_to == "LAST":
@@ -81,6 +92,7 @@ class InvestingComAssetPerformance(AssetPerformance):
     _ic_api_pricecol = "Close"
     _ic_api_pricecol_tessa = "close"
     _use_tessa = True
+    _default_col_name_price = "$(isin)_price"
 
     def __init__(self, *args, **kwargs):
         self._default_setts.update({ "search_args" : dict() })
@@ -123,7 +135,13 @@ class InvestingComAssetPerformance(AssetPerformance):
             warnings.warn(f"Failed to query performance for {self._search_args}. Exception: {ex}.")
         return NotAvailableAssetPerformance._calc_price(self, dates)
 
+    def _get_col_name_price(self, name):
+        for k, v in self._search_args.items():
+            name = name.replace(f"$({k})", v)
+        return name
+
 class CryptoCurrencyAssetPerformance(InvestingComAssetPerformance):
+    _default_col_name_price = "$(symbol)_price"
     def _get_tessa_args(self):
         return [self._search_args['name']], {"source":"coingecko"}
 
