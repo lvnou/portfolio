@@ -22,6 +22,11 @@ search_args_crypto = [
              {"symbol" : "BTC", "name":"bitcoin"}
         ]
 
+search_args_index = [
+             {"symbol" : "EURUSD=X", "name":"EURUSD"}
+        ]
+
+
 def test_notavai_performance():
     na = apf.NotAvailableAssetPerformance(setts=dict())
     p,d = na.price("2021-1-1","2022-1-1", 20)
@@ -93,6 +98,14 @@ def test_crypto_performance_no_timeframe(search_args):
     ic = apf.CryptoCurrencyAssetPerformance(setts={"search_args": search_args})
     p,d = ic.price()
     assert np.any(p != 1.)
+
+@pytest.mark.parametrize("search_args", search_args_index)
+def test_crypto_performance(search_args):
+    ic = apf.IndexAssetPerformance(setts={"search_args": search_args})
+    p,d = ic.price("2021-1-1","2022-1-1", 20)
+    assert p.size == 20
+    assert np.any(p != 1.)
+
 
 def test_performance_handler():
     pfh = apf.AssetPerformanceHandler(setts = {"type": "NOT_AVAILABLE"}).get()

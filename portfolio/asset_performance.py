@@ -35,7 +35,8 @@ class AssetPerformanceHandler(pf.SettedBaseHandler):
             "INVESTINGCOM" : InvestingComAssetPerformance,
             "DEKA_CSV" : DekaCSVAssetPerformance,
             "BOERSEFRANKFURT" : BoerseFrankfurtAssetPerformance,
-            "CRYPTO" : CryptoCurrencyAssetPerformance
+            "CRYPTO" : CryptoCurrencyAssetPerformance,
+            "INDEX" : IndexAssetPerformance
             }
         return super(AssetPerformanceHandler, self).__init__(*args, **kwargs)
 
@@ -145,6 +146,10 @@ class CryptoCurrencyAssetPerformance(InvestingComAssetPerformance):
     def _get_tessa_args(self):
         return [self._search_args['name']], {"source":"coingecko"}
 
+class IndexAssetPerformance(InvestingComAssetPerformance):
+    _default_col_name_price = "$(name)_price"
+    def _get_tessa_args(self):
+        return [self._search_args['symbol']], dict()
 
 class DekaCSVAssetPerformance(AssetPerformance):
     """
