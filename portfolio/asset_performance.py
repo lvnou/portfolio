@@ -44,14 +44,23 @@ class AssetPerformance(pf.SettedBaseclass):
     """
 
     def __init__(self, *args, **kwargs):
+        self._prices = dict()
+        self._cache_price = True
         return super(AssetPerformance, self).__init__(*args, **kwargs)
         
     def _calc_price(self, dates):
         raise NotImplementedError("Abstract class")
 
     def price(self, from_date, to_date, n = 20):
+        calc_key = f"{from_date}_{to_date}_{n}"
         d = pd.date_range(start=from_date, end=to_date,  periods=n)
-        return self._calc_price(d), d
+        if (calc_key not in self._prices) or (not self._cache_price):
+            print("calc price")
+            self._prices[calc_key] = self._calc_price(d)
+        else:
+            print("not calc price")
+            print(self._prices)
+        return self._prices[calc_key], d
 
     def value(self, *args, relative_to = "LAST", **kwargs):
         p, d = self.price(*args, **kwargs)
@@ -131,6 +140,7 @@ class DekaCSVAssetPerformance(AssetPerformance):
 class BoerseFrankfurtAssetPerformance(AssetPerformance):
     """
     https://github.com/joqueka/bf4py
+    NOT MAINTAINED / TESTED!!
     """
     def _parse_setts(self, setts):
         self._isin = self._parse_var(setts["isin"])

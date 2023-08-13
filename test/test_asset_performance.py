@@ -3,6 +3,7 @@ import portfolio.asset_performance as apf
 import pytest
 from .util import get_test_path
 import warnings
+import numpy as np
 
 search_args = [ 
     {"wkn" : "A0YEDG", "isin":"IE00B5BMR087"},
@@ -31,6 +32,7 @@ def test_investcom_performance(search_args):
         ic = apf.InvestingComAssetPerformance(setts={"search_args": search_args})
         p,d = ic.price("2021-1-1","2022-1-1", 20)
         assert p.size == 20
+        assert np.any(p != 1.)
 
 @pytest.mark.parametrize("search_args", search_args_invalid)
 def test_investcom_performance_invalid(search_args):
@@ -38,6 +40,7 @@ def test_investcom_performance_invalid(search_args):
         ic = apf.InvestingComAssetPerformance(setts={"search_args": search_args})
         p,d = ic.price("2021-1-1","2022-1-1", 20)
         assert p.size == 20
+        assert np.all(p == 1.)
 
 
 #def test_boersefrankfurt_performance():
