@@ -7,7 +7,8 @@ class AssetHandler(pf.SettedBaseHandler):
         self._type_dict = {
             "MUTUAL_FUND" : MutualFund,
             "EXCHANGE_TRADED_FUND" : ExchangeTradedFund,
-            "CASH" : Cash 
+            "CASH" : Cash,
+            "CRYPTO_CURRENCY": CryptoCurrency
          }
         return super(AssetHandler, self).__init__(*args, **kwargs)
 
@@ -125,4 +126,8 @@ class MutualFund(Security):
 class ExchangeTradedFund(Security):
     _default_risk_class = 3
     
-    
+class Currency(Asset):
+    _default_risk_class = 5
+
+class CryptoCurrency(Currency):
+    pass

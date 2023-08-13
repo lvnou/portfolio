@@ -34,8 +34,9 @@ class AssetPerformanceHandler(pf.SettedBaseHandler):
             "NOT_AVAILABLE" : NotAvailableAssetPerformance,
             "INVESTINGCOM" : InvestingComAssetPerformance,
             "DEKA_CSV" : DekaCSVAssetPerformance,
-            "BOERSEFRANKFURT" : BoerseFrankfurtAssetPerformance 
-         }
+            "BOERSEFRANKFURT" : BoerseFrankfurtAssetPerformance,
+            "CRYPTO" : CryptoCurrencyAssetPerformance
+            }
         return super(AssetPerformanceHandler, self).__init__(*args, **kwargs)
 
 class AssetPerformance(pf.SettedBaseclass):
@@ -51,16 +52,16 @@ class AssetPerformance(pf.SettedBaseclass):
     def _calc_price(self, dates):
         raise NotImplementedError("Abstract class")
 
-    def price(self, from_date, to_date, n = 20):
+    def price(self, from_date = None, to_date = None, n = 20):
+        "Use None to return the maximum price history, max detailed"
         calc_key = f"{from_date}_{to_date}_{n}"
-        d = pd.date_range(start=from_date, end=to_date,  periods=n)
-        if (calc_key not in self._prices) or (not self._cache_price):
-            print("calc price")
-            self._prices[calc_key] = self._calc_price(d)
+        if (from_date is None) or (to_date is None):
+            d = None
         else:
-            print("not calc price")
-            print(self._prices)
-        return self._prices[calc_key], d
+            d = pd.date_range(start=from_date, end=to_date,  periods=n)
+        if (calc_key not in self._prices) or (not self._cache_price):
+            self._prices[calc_key] = self._calc_price(d)
+        return self._prices[calc_key]
 
     def value(self, *args, relative_to = "LAST", **kwargs):
         p, d = self.price(*args, **kwargs)
@@ -73,7 +74,7 @@ class AssetPerformance(pf.SettedBaseclass):
 class NotAvailableAssetPerformance(AssetPerformance):
     def _calc_price(self, dates):
         warnings.warn("Asset performance not available. Assuming constant price of unity.")
-        return np.ones(dates.shape)
+        return np.ones(dates.shape), dates
 
 class InvestingComAssetPerformance(AssetPerformance):
     _ic_api_timefmt = "%d/%m/%Y"
@@ -101,11 +102,17 @@ class InvestingComAssetPerformance(AssetPerformance):
         self._check_num_items(sr)
         srd = sr[0].retrieve_historical_data(   from_date = min(dates).strftime(self._ic_api_timefmt),
                                                 to_date   = max(dates).strftime(self._ic_api_timefmt) )
-        return interpolate_datetime(dates, srd.index, srd[self._ic_api_pricecol])
+        return interpolate_datetime(dates, srd.index, srd[self._ic_api_pricecol]), dates
+
+    def _get_tessa_args(self):
+        return [self._search_args['isin']], dict()
 
     def _calc_price_tessa(self, dates):
-        sr = tessa.Symbol(self._search_args['isin']).price_history()
-        return interpolate_datetime(dates, sr.df.index, sr.df[self._ic_api_pricecol_tessa])
+        a, kwa = self._get_tessa_args()
+        sr = tessa.Symbol(*a, **kwa).price_history()
+        if dates is None:
+            return sr.df[self._ic_api_pricecol_tessa].to_numpy(), sr.df.index
+        return interpolate_datetime(dates, sr.df.index, sr.df[self._ic_api_pricecol_tessa]), dates
 
     def _calc_price(self, dates):
         try:
@@ -115,6 +122,11 @@ class InvestingComAssetPerformance(AssetPerformance):
         except Exception as ex:
             warnings.warn(f"Failed to query performance for {self._search_args}. Exception: {ex}.")
         return NotAvailableAssetPerformance._calc_price(self, dates)
+
+class CryptoCurrencyAssetPerformance(InvestingComAssetPerformance):
+    def _get_tessa_args(self):
+        return [self._search_args['name']], {"source":"coingecko"}
+
 
 class DekaCSVAssetPerformance(AssetPerformance):
     """
@@ -134,7 +146,7 @@ class DekaCSVAssetPerformance(AssetPerformance):
     def _calc_price(self, dates):
         data = pd.read_csv(self._csv_file, encoding='latin-1', sep=";", decimal=",")
         data[self._deka_timecol] = pd.to_datetime(data[self._deka_timecol])
-        return interpolate_datetime(dates, data[self._deka_timecol], data[self._deka_pricecol])
+        return interpolate_datetime(dates, data[self._deka_timecol], data[self._deka_pricecol]), dates
 
 
 class BoerseFrankfurtAssetPerformance(AssetPerformance):
@@ -150,6 +162,6 @@ class BoerseFrankfurtAssetPerformance(AssetPerformance):
         history = bf4py.general.eod_data(self._isin, min(dates), max(dates))
         history_df = pd.DataFrame(history)
         history_df['date']= pd.to_datetime(history_df['date'])
-        return interpolate_datetime(dates, history_df['date'], history_df['close'])
+        return interpolate_datetime(dates, history_df['date'], history_df['close']), dates
 
 

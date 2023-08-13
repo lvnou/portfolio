@@ -14,6 +14,9 @@ search_args_invalid = [
         {"test":""},
         ]
 
+search_args_crypto = [
+             {"symbol" : "BTC", "name":"bitcoin"}
+        ]
 
 def test_notavai_performance():
     na = apf.NotAvailableAssetPerformance(setts=dict())
@@ -34,6 +37,14 @@ def test_investcom_performance(search_args):
         assert p.size == 20
         assert np.any(p != 1.)
 
+@pytest.mark.parametrize("search_args", search_args)
+def test_investcom_performance_no_timeframe(search_args):
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        ic = apf.InvestingComAssetPerformance(setts={"search_args": search_args})
+        p,d = ic.price()
+        assert np.any(p != 1.)
+
 @pytest.mark.parametrize("search_args", search_args_invalid)
 def test_investcom_performance_invalid(search_args):
     with pytest.warns(UserWarning):
@@ -42,7 +53,7 @@ def test_investcom_performance_invalid(search_args):
         assert p.size == 20
         assert np.all(p == 1.)
 
-
+# NOT MAINTAINED ANYMORE
 #def test_boersefrankfurt_performance():
 #    fn = apf.BoerseFrankfurtAssetPerformance(setts={"isin": 'DE0008404005'})
 #    p,d = fn.price("2021-1-1","2022-1-1", 20)
@@ -58,6 +69,19 @@ def test_dekacsv_performance_outofrange():
     fn = apf.DekaCSVAssetPerformance(setts={"csv_file_path": get_test_path('06_test_asset_performance/DE0008474750_Preisexport.csv')})
     p,d = fn.price("2016-1-1","2022-1-1", 20)
     assert p.size == 20
+
+@pytest.mark.parametrize("search_args", search_args_crypto)
+def test_crypto_performance(search_args):
+    ic = apf.CryptoCurrencyAssetPerformance(setts={"search_args": search_args})
+    p,d = ic.price("2021-1-1","2022-1-1", 20)
+    assert p.size == 20
+    assert np.any(p != 1.)
+
+@pytest.mark.parametrize("search_args", search_args_crypto)
+def test_crypto_performance_no_timeframe(search_args):
+    ic = apf.CryptoCurrencyAssetPerformance(setts={"search_args": search_args})
+    p,d = ic.price()
+    assert np.any(p != 1.)
 
 def test_performance_handler():
     pfh = apf.AssetPerformanceHandler(setts = {"type": "NOT_AVAILABLE"}).get()
