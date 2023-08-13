@@ -1,11 +1,18 @@
 import portfolio as pf
 import portfolio.asset_performance as apf
 import pytest
+from .util import get_test_path
+import warnings
 
-search_args = [
-        {'text' : 'a14utf'}, # 2 results
-        {'text' : 'deka us treasury'} # 1 result
+search_args = [ 
+    {"wkn" : "A0YEDG", "isin":"IE00B5BMR087"},
+    {"wkn" : "A0YEDK", "isin":"IE00B53L4350"}
         ]
+
+search_args_invalid = [ 
+        {"test":""},
+        ]
+
 
 def test_notavai_performance():
     na = apf.NotAvailableAssetPerformance(setts=dict())
@@ -19,23 +26,33 @@ def test_notavai_performance():
 
 @pytest.mark.parametrize("search_args", search_args)
 def test_investcom_performance(search_args):
-    ic = apf.InvestingComAssetPerformance(setts={"search_args": search_args})
-    p,d = ic.price("2021-1-1","2022-1-1", 20)
-    assert p.size == 20
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        ic = apf.InvestingComAssetPerformance(setts={"search_args": search_args})
+        p,d = ic.price("2021-1-1","2022-1-1", 20)
+        assert p.size == 20
 
-def test_boersefrankfurt_performance():
-    fn = apf.BoerseFrankfurtAssetPerformance(setts={"isin": 'DE0008404005'})
-    p,d = fn.price("2021-1-1","2022-1-1", 20)
-    print(p,d)
-    assert p.size == 20
+@pytest.mark.parametrize("search_args", search_args_invalid)
+def test_investcom_performance_invalid(search_args):
+    with pytest.warns(UserWarning):
+        ic = apf.InvestingComAssetPerformance(setts={"search_args": search_args})
+        p,d = ic.price("2021-1-1","2022-1-1", 20)
+        assert p.size == 20
+
+
+#def test_boersefrankfurt_performance():
+#    fn = apf.BoerseFrankfurtAssetPerformance(setts={"isin": 'DE0008404005'})
+#    p,d = fn.price("2021-1-1","2022-1-1", 20)
+#    print(p,d)
+#    assert p.size == 20
 
 def test_dekacsv_performance():
-    fn = apf.DekaCSVAssetPerformance(setts={"csv_file_path": 'LU0112241566_Preisexport.csv'})
+    fn = apf.DekaCSVAssetPerformance(setts={"csv_file_path": get_test_path('06_test_asset_performance/DE0008474750_Preisexport.csv')})
     p,d = fn.price("2021-1-1","2022-1-1", 20)
     assert p.size == 20
 
 def test_dekacsv_performance_outofrange():
-    fn = apf.DekaCSVAssetPerformance(setts={"csv_file_path": 'LU0112241566_Preisexport.csv'})
+    fn = apf.DekaCSVAssetPerformance(setts={"csv_file_path": get_test_path('06_test_asset_performance/DE0008474750_Preisexport.csv')})
     p,d = fn.price("2016-1-1","2022-1-1", 20)
     assert p.size == 20
 

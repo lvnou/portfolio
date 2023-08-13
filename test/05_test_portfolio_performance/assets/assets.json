@@ -19,7 +19,7 @@
                                        },
                 "performance" : {
                                         "type" : "INVESTINGCOM",
-                                        "search_args" : {"text" : "a14utf"}
+                                        "search_args" : {"text" : "INVALID"} /* invalud search so price is given as unity. search is tested elsewhere */
                                 }
 
     },
